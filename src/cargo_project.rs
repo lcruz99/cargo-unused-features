@@ -80,7 +80,7 @@ impl CargoProject {
         if let Some(workspace) = &self.in_memory_toml.workspace {
             let mut members = Vec::new();
             for member in &workspace.members {
-                members.push(Box::from(self.directory.join(&member)));
+                members.push(Box::from(self.directory.join(member)));
             }
             members
         } else {
@@ -147,7 +147,7 @@ impl CargoProject {
     pub fn try_compile(&self) -> anyhow::Result<()> {
         let config = Config::default()?;
         let stdout = io::stdout();
-        let mut handle = stdout.lock();
+        let handle = stdout.lock();
 
         *config.shell() = Shell::from_write(Box::new(handle));
         config.shell().set_verbosity(Verbosity::Verbose);

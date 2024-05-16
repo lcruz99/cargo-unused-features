@@ -2,7 +2,6 @@ use std::{fs, path::Path};
 
 use crate::{utils, TomlEdit};
 use clap::Args;
-pub use clap::Parser;
 
 use crate::Report;
 
@@ -37,7 +36,7 @@ impl PruneCommand {
         for (crate_name, workspace_crate) in report.workspace_crates {
             log::info!("Start pruning features of crate {crate_name}.");
 
-            let contents = fs::read_to_string(&Path::new(&workspace_crate.full_path))?;
+            let contents = fs::read_to_string(Path::new(&workspace_crate.full_path))?;
 
             let mut toml = TomlEdit::new(contents)?;
 
@@ -50,7 +49,7 @@ impl PruneCommand {
 
                 match toml.replace_dependency_features(
                     &dep_name,
-                    diff.cloned().into_iter().collect::<Vec<String>>(),
+                    diff.cloned().collect::<Vec<String>>(),
                 ) {
                     Ok(_) => {}
                     Err(e) => {
