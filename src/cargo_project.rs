@@ -17,7 +17,7 @@ use cargo::{
 use cargo_metadata::Metadata;
 
 use crate::{create_dependencies::CrateDependencies, subcommands::analyze::AnalyzeCommand};
-
+use std::io;
 /// In-memory toml file.
 pub struct CargoProject {
     /// The original toml file contents.
@@ -146,10 +146,11 @@ impl CargoProject {
     /// Tries to compile the project of the this toml file.    
     pub fn try_compile(&self) -> anyhow::Result<()> {
         let config = Config::default()?;
+        let stdout = io::stdout();
+        let mut handle = stdout.lock();
 
-        let buffer = Box::new(Vec::new());
-        *config.shell() = Shell::from_write(buffer);
-        config.shell().set_verbosity(Verbosity::Quiet);
+        *config.shell() = Shell::from_write(Box::new(handle));
+        config.shell().set_verbosity(Verbosity::Verbose);
 
         let mut compile_options = CompileOptions::new(&config, CompileMode::Build)?;
 
@@ -205,6 +206,7 @@ impl CargoProject {
 
         cargo::ops::compile(&workspace, &compile_options)
             .map_err(|e| anyhow::anyhow!("Failed to compile toml document: {}", e))?;
+        
 
         Ok(())
     }
